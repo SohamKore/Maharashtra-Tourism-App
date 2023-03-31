@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/97cd91180b.js" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/d395ac176f.js" crossorigin="anonymous"></script>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css' rel='stylesheet' />
+
+    <title>NAV PLACES</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            transition: .1s ease-in-out;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            background-color: whitesmoke;
+        }
+
+        #nav {
+            height: 100vh;
+            width: 100vw;
+            padding: 0px 0px 100px 0px;
+            background-color: white;
+
+
+        }
+
+        .place_card {
+            position: relative;
+            width: 90vw;
+            max-width: 800px;
+            height: 150px;
+            margin: 10px;
+            border-radius: 15px;
+            box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.209);
+            overflow: hidden;
+            cursor: pointer;
+            transition: .3s ease-in-out;
+            display: flex;
+        }
+
+        .place_card:hover {
+            transform: scale(1.03);
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.34);
+        }
+
+        .place_image {
+            width: 100%;
+            height: 100%;
+            background-image: url("https://i.pinimg.com/originals/f2/ab/f3/f2abf3619f1a5099851f5d9951a56937.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: brightness(1);
+            transition: .3s ease-in-out;
+        }
+
+        .place_card:hover .place_image {
+            filter: brightness(1.1);
+        }
+
+        .place_description {
+            height: 100%;
+            width: 100%;
+            background-color: white;
+            padding: 2px;
+            overflow: auto;
+
+        }
+
+        .place_name {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: .5rem;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100vw;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+
+    <div id="nav">
+        <div  onclick="place_click()" class="place_card" data-streetview-location='{"lat": 18.922, "lng": 72.8356}'>
+            <div class="place_image" >
+
+            </div>
+            <div class="place_description">
+                <label class="place_name">Gateway of India</label>
+                <p>The Gateway of India is an arch monument built during the 20th century in Bombay, India. The monument
+                    was erected to commemorate the landing of King George V and Queen Mary at Apollo Bunder on their
+                    visit to India in 1911. It stands as a major tourist attraction in the city and is one of the most
+                    visited landmarks. The Gateway of India is also a symbol of India's rich colonial history and has
+                    witnessed many historic events over the years.</p>
+            </div>
+
+        </div>
+        <!-- DONE INT -->
+        <div  onclick="place_click()" class="place_card" data-streetview-location='{"lat": 19.1076, "lng": 72.8266}'>
+            <div class="place_image" style=" background-size: cover;
+            background-position: center;width: 100%;
+            height: 100%;
+            background-repeat: no-repeat;
+            filter: brightness(1);
+            transition: .3s ease-in-out;background-image: url(https://cdn.dnaindia.com/sites/default/files/styles/full/public/2019/03/28/806679-juhu-beach-dna.jpg);">
+            </div>
+            <div class="place_description">
+                <label class="place_name">Juhu Beach</label>
+                <p>uhu Beach is one of the most popular beaches in Mumbai, famous for its long stretch of golden sand and picturesque sunsets. It is a popular spot for locals and tourists alike.</p>
+            </div>
+
+        </div>
+            <!-- DONE INT -->
+        <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 18.9855, "lng": 73.2717}'>
+            <div class="place_image"  style=" background-size: cover;
+            background-position: center;width: 100%;
+            height: 100%;
+            background-repeat: no-repeat;
+            filter: brightness(1);
+            transition: .3s ease-in-out;background-image: url(https://th.bing.com/th/id/R.5e385e7e2018c912391e88276ad517fa?rik=5C01X6ABp305qQ&riu=http%3a%2f%2fwww.travelingtoworld.com%2fwp-content%2fuploads%2f2015%2f10%2fmatheran-hill-station.jpg&ehk=9TAetszz9Ic2VLBfJ2nAfRsvoo4qOWdcMVCzQOWO4Lc%3d&risl=&pid=ImgRaw&r=0
+);">
+            >
+            </div>
+            <div class="place_description">
+                <label class="place_name">Matheran Hill Station</label>
+                <p> Matheran is a popular hill station located near Mumbai, known for its scenic beauty and serene atmosphere. It is a great place to escape the hustle and bustle of city life and enjoy nature..</p>
+            </div>
+
+        </div>
+            <!-- //DONE INT -->
+        <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 19.6107, "lng": 72.7288 }'>
+            <div class="place_image" style="background-image: url(            https://th.bing.com/th/id/R.c5777b5f27edb3278998667dbe8d59c1?rik=0jDofwiofVTjrA&riu=http%3a%2f%2fkelvalushgreen.com%2fwp-content%2fuploads%2f2017%2f01%2fkelva-beach-2.jpg&ehk=j9AxNz7G1VGjGX0WjSnH9bRGyWe%2b56wde6Suv%2f37o2s%3d&risl=&pid=ImgRaw&r=0
+            );">
+            </div>
+            <div class="place_description">
+                <label class="place_name"> Kelva Beach</label>
+                <p> Kelva Beach is a pristine beach located in Palghar, known for its serene surroundings and picturesque views. It is a popular spot for beach camping and water sports.</p>
+            </div>
+
+        </div>
+            <!-- //DONE INT -->
+        <div onclick="place_click()" class="place_card" data-streetview-location='{"lat":   18.23723, "lng": 73.44580 }'>
+            <div class="place_image" style="background-image: url(https://th.bing.com/th/id/OIP.wOEG-xaKHRCX_7tVxd1IkgHaFj?pid=ImgDet&rs=1);">
+            </div>
+            <div class="place_description">
+                <label class="place_name"> Raigad Fort</label>
+                <p> Raigad Fort is a historical fort located in the Raigad district of Maharashtra. It was the capital of the Maratha Empire under the rule of Chhatrapati Shivaji Maharaj and is known for its rich history and stunning architecture.</p>
+            </div>
+
+        </div>
+        <!-- done int -->
+        <div onclick="place_click()" class="place_card" data-streetview-location='{"lat":16.01581, "lng": 73.48913}'>
+            <div class="place_image" style="background-image: url(https://th.bing.com/th/id/OIP.Umw4MqOuks_zzD-X8_iU4wHaEK?pid=ImgDet&rs=1);">
+            </div>
+            <div class="place_description">
+                <label class="place_name"> Ganpatipule Beach</label>
+                <p> Ganpatipule Beach is a beautiful beach located in the Ratnagiri district of Maharashtra. It is known for its clear waters and picturesque surroundings, and is a popular spot for water sports and beach activities.</p>
+            </div>
+
+        </div>
+        <!-- DONE INT -->
+        <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 16.01409, "lng":  73.48954}'>
+            <div class="place_image" style="background-image: url(https://spinninghabits.files.wordpress.com/2016/11/pa220185.jpg);">
+            </div>
+            <div class="place_description">
+                <label class="place_name">Tarkarli Beach</label>
+                <p> Tarkarli Beach is a pristine beach located in Sindhudurg, known for its crystal clear waters and white sand. It is a popular spot for snorkelling and scuba diving, and is also known for its seafood.</p>
+            </div>
+
+        </div>
+        <!-- DONE INT -->
+        <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 18.366673, "lng": 73.75159}'>
+            <div class="place_image" style="background-image: url(https://th.bing.com/th/id/OIP.xKuAf2GsMWksnPZahBjangHaE9?pid=ImgDet&rs=1);">
+            </div>
+            <div class="place_description">
+                <label class="place_name"> Sinhagad Fort</label>
+                <p>Sinhagad Fort is a historic fort located near Pune, known for its rich history and stunning views of the surrounding landscape. It is a popular spot for trekking and hiking.</p>
+            </div>
+
+        </div>
+        <!-- DONE INT -->
+        <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 20.55250, "lng": 75.70112}'>
+            <div class="place_image" style="background-image: url(https://www.visittnt.com/blog/wp-content/uploads/2018/09/Elephanta-Caves.jpeg);">
+            </div>
+            <div class="place_description">
+                <label class="place_name"> Ajanta and Ellora Caves </label>
+                <p>Ajanta and Ellora Caves are UNESCO World Heritage Sites located in Aurangabad. These ancient rock-cut structures are famous for their beautiful paintings and sculptures.</p>
+            </div>
+
+        </div>
+        <!-- DONE INT -->
+        <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 18.76262, "lng": 73.35328}'>
+            <div class="place_image" style="background-image: url(https://th.bing.com/th/id/OIP.cBsOMB6TZOisRmzGt_GCywHaE8?pid=ImgDet&rs=1);">
+            </div>
+            <div class="place_description">
+                <label class="place_name">Lonavala </label>
+                <p> Lonavala is a beautiful hill station located near Pune, known for its lush green valleys, waterfalls, and historic forts.</p>
+            </div>
+
+        </div>
+
+
+
+        <!-- ////////////////////////////////////////
+        ////////////////////////////////////////////// -->
+    </div>
+  
+</body>
+<script>
+    mapboxgl.accessToken = 'ADD_MAPBOX_TOKEN';
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [73.8567, 18.5204],
+        zoom: 8
+    });
+
+    document.getElementById('map').style.display = 'none';
+
+    // Add click event listeners for the navigation cards
+    var navCards = document.getElementsByClassName('place_card');
+    for (var i = 0; i < navCards.length; i++) {
+        var navCard = navCards[i];
+        navCard.addEventListener('click', function () {
+            // Hide the navigation div
+            document.getElementById('nav').style.display = 'none';
+
+            // Show the map div
+            document.getElementById('map').style.display = 'block';
+
+            // Get the streetview location from the data attribute of the clicked card
+            var streetviewLocation = JSON.parse(this.getAttribute('data-streetview-location'));
+
+            // Load the street view of the location
+            var streetview = new google.maps.StreetViewService();
+            streetview.getPanorama({ location: streetviewLocation, radius: 50 }, function (data, status) {
+                if (status === google.maps.StreetViewStatus.OK) {
+                    var panorama = new google.maps.StreetViewPanorama(document.getElementById('map'), { position: streetviewLocation });
+                } else {
+                    alert('Street View data not found for this location.');
+                }
+            });
+        });
+    }
+
+
+
+</script>
+
+
+<script
+    src='https://maps.googleapis.com/maps/api/js?key="ADD_STREETVIEW_API_KEY"&callback=initMap'></script>
+</script>
+
+</html>
