@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/97cd91180b.js" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/d395ac176f.js" crossorigin="anonymous"></script>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css' rel='stylesheet' />
+
+    <title>NAV PLACES</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            transition: .4s ease-in-out;
+            color: black;
+        }
+
+
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            background-color: whitesmoke;
+        }
+
+        #nav {
+            height: 100vh;
+            width: 100vw;
+            padding: 0px 0px 10px 0px;
+            background-color: rgb(255, 255, 245);
+
+
+        }
+
+        .place_card {
+            animation: pop-up .3s ease-out;
+
+            position: relative;
+            width: 90vw;
+            max-width: 800px;
+            height: 150px;
+            margin: 10px;
+            border-radius: 15px;
+            box-shadow: 7px 6px 1px rgba(0, 0, 0, 0.129);
+            overflow: hidden;
+            cursor: pointer;
+            transition: .3s ease-in-out;
+            display: flex;
+            border: 3px solid rgba(0, 0, 0, 0.129);
+            border-bottom: 0;
+        }
+
+        .place_card:hover {
+            transform: scale(1.03);
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.34);
+        }
+
+        .place_image {
+            width: 100%;
+            height: 100%;
+            background-image: url("https://i.pinimg.com/originals/f2/ab/f3/f2abf3619f1a5099851f5d9951a56937.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: brightness(1);
+            transition: .3s ease-in-out;
+        }
+
+        .place_card:hover .place_image {
+            filter: brightness(1.1);
+        }
+
+        .place_description {
+            height: 100%;
+            width: 100%;
+            background-color: white;
+            padding: 2px;
+            overflow: auto;
+
+        }
+
+        .place_name {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: .5rem;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100vw;
+            position: absolute;
+            top: 0;
+            display: none;
+            bottom: 0;
+
+
+
+        }
+            /* HIDES GOOGLE LAYOUT */
+        .mapboxgl-ctrl-attrib.mapboxgl-compact {
+            display: none;
+        }
+
+        .mapboxgl-ctrl-bottom-left {
+            display: none;
+        }
+
+        .dismissButton {
+            background-color: red;
+        }
+
+        div.gmnoprint {
+            display: none;
+        }
+
+        .gm-style .gm-style-cc a,
+        .gm-style .gm-style-cc button,
+        .gm-style .gm-style-cc span {
+            display: none;
+        }
+
+        .gm-style img {
+            max-width: none;
+            display: none;
+        }
+
+        /* .gm-iv-address {
+            display: none !important;
+        } */
+
+
+        /* div .gm-style-cc {
+            display: none;
+        } */
+
+        /* .gm-fullscreen-control {
+            display: none !important;
+        } */
+
+        /* .gm-iv-address {
+            display: none !important;
+        } */
+
+        #info_btn {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            font-size: 5vh;
+            z-index: 3;
+            color: black;
+
+        }
+
+
+        .info_box {
+            padding: 30px;
+            width: 100%;
+            height: 100%;
+            color: white;
+            /* background-color: red; */
+            position: absolute;
+            top: 0;
+            display: none;
+            z-index: 3;
+            backdrop-filter: blur(15px);
+            opacity: 1;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            filter: saturate(2);
+        }
+
+        #info_close {
+            border-radius: 10px;
+            border: 1.3px solid black;
+            padding: 5px 18px 5px 18px;
+            background-color: black;
+        }
+
+        #info_box_h {
+            color: #1e00f9;
+            text-shadow: 2px 2px 1px #00fdff;
+        }
+
+        #info_box_p {
+            color: black;
+            text-shadow: 2px 1px 1px white;
+            font-size: 15px;
+
+        }
+        .actionbar{
+            /* opacity: 70%; */
+
+            filter: saturate(2);
+    backdrop-filter: blur(15px);
+            background-image: linear-gradient(45deg,rgba(255, 234, 0, 0.499),rgba(255, 162, 0, 0.308));
+            /* background-color: rgba(249, 174, 0, 0.443); */
+            border-top: none;
+    display: flex;
+    width: 100vw;
+    height: 6.5vh;
+    top: 0;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    align-content: center;
+    align-items: center;
+    z-index: 99;
+    position: fixed;
+    justify-content: space-between;
+    padding: 0px 15px 0px 15px;
+    border-radius: 0px 0px 20px 20px;
+
+        }
+        .top_name{
+            color: rgb(0, 0, 0);
+            animation: pop-up .2s ease-out;
+            /* text-shadow: 2px 2px 0px black; */
+            font-size:2.4vh;
+            font-weight: 900;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            /* font-family:'Times New Roman', Times, serif; */
+
+        }
+        #square_info{
+            color: rgb(0, 0, 0);
+            font-size: 3vh;
+        }
+        .spacer{
+            height:6vh;
+            width: 100vw;
+            background-color: rgba(255, 255, 255, 0);
+        }
+        .about_box{
+            transition: opacity 0.5s ease-in-out; /* Add a transition effect for the opacity property */
+          opacity: 0;
+            filter: saturate(16);
+    backdrop-filter: blur(15px);
+    filter: brightness(120%);
+           /* background-color: red; */
+    border-radius: 20px;
+    height: auto;
+    width: 95vw;
+    z-index: 99;
+    border: 2px solid rgba(255, 255, 255, 0.298);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    filter: saturate(2);
+    backdrop-filter: blur(15px);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0px 0px 90px black;
+
+            /* animation: pop-up .2s ease-out; */
+
+
+padding: 10px;
+        }
+        .about_box.show {
+  opacity: 1; /* Change the opacity to 1 when the element is shown */
+}
+
+        @keyframes pop-up {
+  0% {
+    transform: scale(0.7);
+  }
+  50%{
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+#searchInput{
+    width: 100%;
+    padding: 10px;
+    color: black;
+    text-align: center;
+    margin: 10px 5px 10px 5px;
+    border: 1px solid yellow;
+    
+}
+    </style>
+</head>
+
+<body>
+
+<div id='map'>
+
+    <i onclick="info_click()" class="fa-solid fa-circle-info" id="info_btn"></i>
+    <div class="info_box">
+        <h1 id="info_box_h">ayo</h1>
+        <p id="info_box_p">boi aint no way the fkin github server died dats why no descrii</p>
+        <label id="info_close" onclick="document.querySelector('.info_box').style.display = 'none';">CLOSE</label>
+    </div>
+
+</div>
+
+<div id="nav">
+
+    <div class="actionbar">
+
+
+
+        <label class="top_name">MH Virtual Tourism</label>
+
+        <i class="fa-regular fa-circle-question" id="square_info"
+           onclick="document.querySelector('.about_box').style.display = 'flex';""
+        ></i>
+    </div>
+
+    <div class="about_box">
+        <h1 style="font-size: medium;">About</h1>
+        <label style="font-size: small;">
+            👋 Hello! Thanks for downloading our app 😊. This app was created as our final year project by a group of 💻 computer engineering students.
+        </label>
+        <label  onclick="document.querySelector('.about_box').style.display = 'none';"
+                style="padding: 10px;color:rgba(0, 0, 0, 0.541);font-size: small;width: 95%;border: 2px solid rgba(255, 255, 255, 0.39);border-radius: 100px;text-align: center;"
+        >CLOSE</label>
+
+
+    </div>
+
+    <div class="spacer"></div>
+
+    <!-- /searchBar -->
+    <input type="text" id="searchInput" oninput="searchCards()" placeholder="Search Places">
+
+
+
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 18.922, "lng": 72.8356}'>
+        <div class="place_image">
+
+        </div>
+
+
+
+        <div class="place_description">
+            <label class="place_name">Gateway of India</label>
+            <p id="place_card_id">The Gateway of India is an arch monument built during the 20th century in Bombay,
+                India. The monument
+                was erected to commemorate the landing of King George V and Queen Mary at Apollo Bunder on their
+                visit to India in 1911. It stands as a major tourist attraction in the city and is one of the most
+                visited landmarks. The Gateway of India is also a symbol of India's rich colonial history and has
+                witnessed many historic events over the years.</p>
+        </div>
+
+
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 19.10228, "lng": 72.82443}'>
+        <div class="place_image"
+             style=" background-size: cover;
+            background-position: center;width: 100%;
+            height: 100%;
+            background-repeat: no-repeat;
+            filter: brightness(1);
+            transition: .3s ease-in-out;background-image: url(https://cdn.dnaindia.com/sites/default/files/styles/full/public/2019/03/28/806679-juhu-beach-dna.jpg);">
+        </div>
+        <div class="place_description">
+            <label class="place_name">Juhu Beach</label>
+            <p id="place_card_id">Juhu Beach is one of the most popular beaches in Mumbai, famous for its long
+                stretch of golden sand and picturesque sunsets. It is a popular spot for locals and tourists alike.
+            </p>
+        </div>
+
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 18.9855, "lng": 73.2717}'>
+        <div class="place_image" style=" background-size: cover;
+            background-position: center;width: 100%;
+            height: 100%;
+            background-repeat: no-repeat;
+            filter: brightness(1);
+            transition: .3s ease-in-out;background-image: url(https://th.bing.com/th/id/R.5e385e7e2018c912391e88276ad517fa?rik=5C01X6ABp305qQ&riu=http%3a%2f%2fwww.travelingtoworld.com%2fwp-content%2fuploads%2f2015%2f10%2fmatheran-hill-station.jpg&ehk=9TAetszz9Ic2VLBfJ2nAfRsvoo4qOWdcMVCzQOWO4Lc%3d&risl=&pid=ImgRaw&r=0
+);">
+
+        </div>
+        <div class="place_description">
+            <label class="place_name">Matheran Hill Station</label>
+            <p id="place_card_id"> Matheran is a popular hill station located near Mumbai, known for its scenic
+                beauty and serene atmosphere. It is a great place to escape the hustle and bustle of city life and
+                enjoy nature..</p>
+        </div>
+
+    </div>
+    <!-- //DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 19.6107, "lng": 72.7288 }'>
+        <div class="place_image" style="background-image: url(            https://th.bing.com/th/id/R.c5777b5f27edb3278998667dbe8d59c1?rik=0jDofwiofVTjrA&riu=http%3a%2f%2fkelvalushgreen.com%2fwp-content%2fuploads%2f2017%2f01%2fkelva-beach-2.jpg&ehk=j9AxNz7G1VGjGX0WjSnH9bRGyWe%2b56wde6Suv%2f37o2s%3d&risl=&pid=ImgRaw&r=0
+            );">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Kelva Beach</label>
+            <p id="place_card_id"> Kelva Beach is a pristine beach located in Palghar, known for its serene
+                surroundings and picturesque views. It is a popular spot for beach camping and water sports.</p>
+        </div>
+
+    </div>
+    <!-- //DONE INT -->
+    <div onclick="place_click()" class="place_card"
+         data-streetview-location='{"lat":   18.23723, "lng": 73.44580 }'>
+        <div class="place_image"
+             style="background-image: url(https://th.bing.com/th/id/OIP.wOEG-xaKHRCX_7tVxd1IkgHaFj?pid=ImgDet&rs=1);">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Raigad Fort</label>
+            <p id="place_card_id"> Raigad Fort is a historical fort located in the Raigad district of Maharashtra.
+                It was the capital of the Maratha Empire under the rule of Chhatrapati Shivaji Maharaj and is known
+                for its rich history and stunning architecture.</p>
+        </div>
+
+    </div>
+    <!-- done int -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat":16.01581, "lng": 73.48913}'>
+        <div class="place_image"
+             style="background-image: url(https://th.bing.com/th/id/OIP.Umw4MqOuks_zzD-X8_iU4wHaEK?pid=ImgDet&rs=1);">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Ganpatipule Beach</label>
+            <p id="place_card_id"> Ganpatipule Beach is a beautiful beach located in the Ratnagiri district of
+                Maharashtra. It is known for its clear waters and picturesque surroundings, and is a popular spot
+                for water sports and beach activities.</p>
+        </div>
+
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 16.01409, "lng":  73.48954}'>
+        <div class="place_image"
+             style="background-image: url(https://spinninghabits.files.wordpress.com/2016/11/pa220185.jpg);">
+        </div>
+        <div class="place_description">
+            <label class="place_name">Tarkarli Beach</label>
+            <p id="place_card_id"> Tarkarli Beach is a pristine beach located in Sindhudurg, known for its crystal
+                clear waters and white sand. It is a popular spot for snorkelling and scuba diving, and is also
+                known for its seafood.</p>
+        </div>
+
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 18.366673, "lng": 73.75159}'>
+        <div class="place_image"
+             style="background-image: url(https://th.bing.com/th/id/OIP.xKuAf2GsMWksnPZahBjangHaE9?pid=ImgDet&rs=1);">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Sinhagad Fort</label>
+            <p id="place_card_id">Sinhagad Fort is a historic fort located near Pune, known for its rich history and
+                stunning views of the surrounding landscape. It is a popular spot for trekking and hiking.</p>
+        </div>
+
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 20.55250, "lng": 75.70112}'>
+        <div class="place_image"
+             style="background-image: url(https://www.visittnt.com/blog/wp-content/uploads/2018/09/Elephanta-Caves.jpeg);">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Ajanta and Ellora Caves </label>
+            <p id="place_card_id">Ajanta and Ellora Caves are UNESCO World Heritage Sites located in Aurangabad.
+                These ancient rock-cut structures are famous for their beautiful paintings and sculptures.</p>
+        </div>
+
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 18.76262, "lng": 73.35328}'>
+        <div class="place_image"
+             style="background-image: url(https://th.bing.com/th/id/OIP.cBsOMB6TZOisRmzGt_GCywHaE8?pid=ImgDet&rs=1);">
+        </div>
+        <div class="place_description">
+            <label class="place_name">Lonavala </label>
+            <p id="place_card_id"> Lonavala is a beautiful hill station located near Pune, known for its lush green
+                valleys, waterfalls, and historic forts.</p>
+        </div>
+
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 19.76832, "lng": 74.47272}'>
+        <div class="place_image"
+             style="background-image: url(https://lh5.googleusercontent.com/p/AF1QipMMvj-NvYgSrFZsUUqsudEYKqB9TP1lsTC3d5ms=w408-h306-k-no);">
+        </div>
+        <div class="place_description">
+            <label class="place_name">Mahabaleshwar </label>
+            <p id="place_card_id"> Mahabaleshwar is a hill station situated in the Western Ghats, famous for its
+                beautiful viewpoints, waterfalls, and strawberry farms.</p>
+        </div>
+
+    </div>
+
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 18.76262, "lng": 73.35328}'>
+        <div class="place_image"
+             style="background-image: url(https://th.bing.com/th/id/OIP.MqaciRqpMvAkrq_x8lW3zQHaE8?pid=ImgDet&rs=1);">
+        </div>
+        <div class="place_description">
+            <label class="place_name">Shirdi </label>
+            <p id="place_card_id">a pilgrimage site located in the Ahmednagar district, known for the Sai Baba
+                temple and its peaceful surroundings.</p>
+        </div>
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 18.63909, "lng": 72.87088}'>
+        <div class="place_image"
+             style="background-image: url(https://lh5.googleusercontent.com/p/AF1QipMOJO85SznJ95koT-vCce8gRmWC9XgnvqxIHb0=w408-h272-k-no);">
+        </div>
+        <div class="place_description">
+            <label class="place_name">Alibaug Beach </label>
+            <p id="place_card_id"> a beautiful coastal town located on the outskirts of Mumbai, known for its
+                beautiful beaches, historic forts, and scenic beauty.</p>
+        </div>
+    </div>
+
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 18.51941, "lng": 73.85603}'>
+        <div class="place_image"
+             style="background-image: url(https://th.bing.com/th?id=AxmiyRCg25lnAvg480x360&w=210&h=140&c=8&rs=1&qlt=90&o=6&dpr=1.1&pid=3.1&rm=2);">
+        </div>
+        <div class="place_description">
+            <label class="place_name">Shaniwar Wada</label>
+            <p id="place_card_id">It is a historical fortification and a palace located in the heart of Pune city.
+                It was built in 1732 and was the seat of the Peshwas, the prime ministers of the Maratha Empire.</p>
+        </div>
+    </div>
+
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 19.22231, "lng": 72.95619}'>
+        <div class="place_image"
+             style="background-image: url(https://th.bing.com/th?id=ADUjqapGUf+VimQ480x360&w=252&h=140&c=8&rs=1&qlt=90&o=6&dpr=1.1&pid=3.1&rm=2);">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Upvan Lake</label>
+            <p id="place_card_id">It is an artificial lake located in Thane city and is a popular tourist
+                destination. It is surrounded by a beautiful garden and is a great place for picnics and evening
+                walks.</p>
+        </div>
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 20.00555, "lng": 73.68740}'>
+        <div class="place_image"
+             style="background-image: url(https://lh5.googleusercontent.com/p/AF1QipNeufJCdaeGhTymgCbuA6bmSMz2a135slT59oo1=w408-h484-k-no);">
+        </div>
+        <div class="place_description">
+            <label class="place_name">Sula Vineyards</label>
+            <p id="place_card_id"> It is a popular winery and vineyard located in Nashik. It is known for producing
+                some of the best wines in India and offers tours, tastings, and other activities for visitors.
+
+            </p>
+        </div>
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 21.12837, "lng": 79.06742}'>
+        <div class="place_image"
+             style="background-image: url(https://th.bing.com/th/id/OIP.kX04FLIcBU3nROtk_EzAZwHaFj?pid=ImgDet&rs=1);">
+        </div>
+        <div class="place_description">
+            <label class="place_name">Deekshabhoomi</label>
+            <p id="place_card_id"> It is a Buddhist monument and a pilgrimage center located in Nagpur. It is famous
+                for its architecture and historical significance as it was the place where Dr. B.R. Ambedkar
+                converted to Buddhism.
+
+            </p>
+        </div>
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 17.51975, "lng": 76.20692}'>
+        <div class="place_image"
+             style="background-image: url(https://lh5.googleusercontent.com/p/AF1QipORI0Isr6zq6moCKgwrQdTQ_a0_wquVZ4gLzqg7=w203-h270-k-no);">
+        </div>
+        <div class="place_description">
+            <label class="place_name">Akkalkot Swami Samarth Maharaj Temple</label>
+            <p id="place_card_id"> It is a famous temple dedicated to Swami Samarth Maharaj, a revered saint in
+                Maharashtra. It is believed to be a source of spiritual enlightenment and attracts a large number of
+                devotees.
+
+            </p>
+        </div>
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 21.40608, "lng": 77.14843}'>
+        <div class="place_image" style="background-image: url(
+                    https://lh5.googleusercontent.com/p/AF1QipM7CnV_QFRILUaksui4c1P-8H267t2j9gL5ehtE=w408-h291-k-no);">
+        </div>
+        <div class="place_description">
+            <label class="place_name">Melghat Tiger Reserve</label>
+            <p id="place_card_id">
+                It is a wildlife sanctuary located in the Satpura Range of Maharashtra and is home to a variety of
+                flora and fauna including tigers, leopards, and sloth bears.
+
+            </p>
+        </div>
+    </div>
+
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 16.69465, "lng": 74.22254}'>
+        <div class="place_image" style="background-image: url(
+    https://lh5.googleusercontent.com/p/AF1QipNjxp4goO4zHUaLnIUvttWU_gn692LkrrKJbvdC=w408-h306-k-no
+                    );">
+        </div>
+        <div class="place_description">
+            <label class="place_name">Mahalaxmi Temple</label>
+            <p id="place_card_id">
+                It is a famous temple dedicated to Goddess Mahalaxmi, the goddess of wealth and prosperity. It is
+                one of the most important religious sites in Maharashtra and attracts a large number of devotees.
+
+
+            </p>
+        </div>
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 17.72588, "lng": 73.82680}'>
+        <div class="place_image" style="background-image: url(
+https://lh5.googleusercontent.com/p/AF1QipNeABGm0MLphlDWH2TXr0hhEjIium2zv_6rcGbs=w408-h272-k-no
+                    );">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Kaas Plateau</label>
+            <p id="place_card_id">
+                It is a UNESCO World Heritage Site located in the Satara district and is famous for its stunning
+                natural beauty. It is home to a variety of endemic flowers and plants and is a great place for
+                nature lovers.
+
+            </p>
+        </div>
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 17.15022, "lng": 74.37858}'>
+        <div class="place_image" style="background-image: url(
+https://lh5.googleusercontent.com/p/AF1QipNX3LV96e5AHh78B5WWPxPBXDyyVAgU_DwR089H=w203-h152-k-no
+                );">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Sagareshwar Wildlife Sanctuary </label>
+            <p id="place_card_id">
+                It is a wildlife sanctuary located in the Sangli district and is home to a variety of animals
+                including tigers, leopards, and deer.
+            </p>
+        </div>
+    </div>
+
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 19.93763, "lng": 78.32123}'>
+        <div class="place_image" style="background-image: url(
+                  https://lh5.googleusercontent.com/p/AF1QipPA2-vqd6AFH2eK7Z9OeMkpFR7QiHqko062oR5R=w408-h271-k-no
+                                    );">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Tipeshwar Wildlife Sanctuary </label>
+            <p id="place_card_id">
+                A wildlife sanctuary that is home to a diverse range of flora and fauna, including tigers, leopards,
+                and sloth bears.
+            </p>
+        </div>
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 18.84237, "lng": 76.53501}'>
+        <div class="place_image" style="background-image: url(
+                    https://lh5.googleusercontent.com/p/AF1QipMvF7fGt24BQoadN5JmkxfYYadl_t-a-PZBDndP=w408-h271-k-no
+                                        );">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Tadoba Andhari Tiger Reserve </label>
+            <p id="place_card_id">
+                A wildlife sanctuary and tiger reserve that is home to several endangered species, including the
+                Indian leopard and Bengal tiger.
+            </p>
+        </div>
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 21.33008, "lng": 80.03196}'>
+        <div class="place_image" style="background-image: url(
+                    https://lh5.googleusercontent.com/p/AF1QipOz4qibZ9raU2lMPIrkd5Nw5ZdViaCi-mjTPjI=w408-h271-k-no
+                                            );">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Nagzira Wildlife Sanctuary </label>
+            <p id="place_card_id">
+                A wildlife sanctuary that is home to several species of flora and fauna, including tigers, leopards,
+                and Indian gaur.
+            </p>
+        </div>
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 19.53708, "lng": 77.04153}'>
+        <div class="place_image"
+             style="background-image: url(
+https://lh5.googleusercontent.com/p/AF1QipPkrPaHfRx2eRX_alJOC9RN2qrg4BldDhUOXpbP=w408-h543-k-no                                            );">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Aundha Nagnath Temple </label>
+            <p id="place_card_id">
+                A historic hill fort that served as the capital of the Ausa Sultanate during the medieval era.
+
+            </p>
+        </div>
+    </div>
+
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 19.53708, "lng": 77.04153}'>
+        <div class="place_image"
+             style="background-image: url(
+         https://lh5.googleusercontent.com/p/AF1QipP8YsJIFlWfOalI-cKP093__gghVvskD1Z9VRts=w426-h240-k-no                                         );">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Auasa Fort </label>
+            <p id="place_card_id">
+                A wildlife sanctuary that is home to several species of flora and fauna, including tigers, leopards,
+                and Indian gaur.
+            </p>
+        </div>
+    </div>
+
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 19.22881, "lng": 72.91817}'>
+        <div class="place_image"
+             style="background-image: url(
+https://lh5.googleusercontent.com/p/AF1QipN5yaW_poNDGueQcP1exi9YXX2Rf_8-l11i_HiS=w408-h272-k-no                                     );">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Sanjay Gandhi National Park </label>
+            <p id="place_card_id">
+                A wildlife sanctuary that is home to several species of flora and fauna, including tigers, leopards,
+                and Indian gaur.
+            </p>
+        </div>
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 19.15234, "lng": 72.31879}'>
+        <div class="place_image"
+             style="background-image: url(
+https://lh5.googleusercontent.com/p/AF1QipOY-DOWb3fbrf9Wx8EIjECccYEcg9Mkg365IFKK=w408-h306-k-no                            );">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Hazur Sahib Nanded </label>
+            <p id="place_card_id">
+                A wildlife sanctuary that is home to several species of flora and fauna, including tigers, leopards,
+                and Indian gaur.
+            </p>
+        </div>
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 18.01236, "lng": 76.06602}'>
+        <div class="place_image"
+             style="background-image: url(
+                   https://lh5.googleusercontent.com/p/AF1QipNy6Nhz4_ZypeOXmMyDu41-_9q8HzKDEPlBQqXh=w408-h528-k-no                     );">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Tulja Bhavani Temple </label>
+            <p id="place_card_id">
+                A Hindu temple dedicated to the goddess Tulja Bhavani, which is believed to be one of the 51 Shakti
+                Peethas in India.
+            </p>
+        </div>
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 18.29947, "lng": 72.96632}'>
+        <div class="place_image" style="background-image: url(
+                          https://lh5.googleusercontent.com/p/AF1QipNgS4P5WRx81CzxcPBVW88XQA3vg8Mf1_vqcJVO=w408-h544-k-no
+                                             );">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Murud Janjira </label>
+            <p id="place_card_id">
+                A historic fort located on an island off the coast of Maharashtra, known for its unique architecture
+                and scenic views.
+
+            </p>
+        </div>
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 20.72902, "lng": 78.66198}'>
+        <div class="place_image" style="background-image: url(
+                                        https://lh5.googleusercontent.com/p/AF1QipPz5Rw-BDfGWPvUADki1yxNT180kg4XwN4TwrIv=w408-h306-k-no
+
+                                          );">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Sevagram Ashram </label>
+            <p id="place_card_id">
+                A historic ashram where Mahatma Gandhi lived and worked for several years, and which played a key
+                role in India's independence movement.
+
+            </p>
+        </div>
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 20.47950, "lng": 77.49505}'>
+        <div class="place_image" style="background-image: url(
+                                   https://lh5.googleusercontent.com/p/AF1QipPBfeQrSPBCCPFEOjOn3Q3JYAm8NWzOAM6zmlpV=w408-h544-k-no
+                                     );">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Karanja Lad Guru Mandir </label>
+            <p id="place_card_id">
+                A historic town known for its 11th-century temple complex, which is dedicated to Lord Shiva and is
+                one of the oldest in Maharashtra.
+
+
+            </p>
+        </div>
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 18.94487, "lng": 72.83367}'>
+        <div class="place_image" style="background-image: url(
+                                     https://lh5.googleusercontent.com/p/AF1QipPFgXj6WuX_sEKnmvoDyHuEo3aAKq4OhZVqBfLq=w408-h306-k-no
+                                      );">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Chhatrapati Shivaji Terminus </label>
+            <p id="place_card_id">
+                A historic railway station and UNESCO World Heritage Site known for its Victorian Gothic
+                architecture.
+
+            </p>
+        </div>
+    </div>
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 19.19799, "lng": 81.21686}'>
+        <div class="place_image" style="background-image: url(
+                                        https://lh5.googleusercontent.com/p/AF1QipP7n3EEPhX-u9slQWRqi3cSVgpjs6C8-5xwdayC=w482-h240-k-no
+                                           );">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Indravati National Park </label>
+            <p id="place_card_id">
+                A wildlife sanctuary and national park that is home to several endangered species, including the
+                Indian tiger and Indian bison.
+
+
+            </p>
+        </div>
+    </div>
+
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 19.197703, "lng": 76.51312}'>
+        <div class="place_image"
+             style="background-image: url(
+                                             https://lh5.googleusercontent.com/p/AF1QipMo3ZkwwDJWm-MQgVzeT7I55Oc2iKAqiyyC41R-=w408-h306-k-no  );">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Buldhana - Lonar Crater </label>
+            <p id="place_card_id">
+                A meteorite impact crater lake that is one of the largest and oldest of its kind in the world.
+            </p>
+        </div>
+    </div>
+
+    <!-- DONE INT -->
+    <div onclick="place_click()" class="place_card" data-streetview-location='{"lat": 19.63753, "lng": 76.69825}'>
+        <div class="place_image"
+             style="background-image: url(
+                    https://lh5.googleusercontent.com/p/AF1QipMwgPEMURsnWE5-8TL9FNDfBMAXHG0F9JZi24o=w408-h544-k-no
+             );">
+        </div>
+        <div class="place_description">
+            <label class="place_name"> Nemgiri Jain Temple </label>
+            <p id="place_card_id">
+                The Nemgiri Jain Temple, also known as the Nemgiri Tirth, is a Jain pilgrimage site located in the Osmanabad district of Maharashtra, India. The temple is situated on top of a hill and is surrounded by scenic natural beauty.
+
+            </p>
+        </div>
+    </div>
+    <div class="spacer"></div>
+    <!-- ////////////////////////////////////////
+    ////////////////////////////////////////////// -->
+</div>
+
+</body>
+<script>
+
+
+
+function searchCards() {
+    // Get input element and value
+    var input = document.getElementById("searchInput");
+    var query = input.value.toLowerCase();
+
+    // Get all place cards
+    var placeCards = document.getElementsByClassName("place_card");
+
+    // Loop through each place card
+    for (var i = 0; i < placeCards.length; i++) {
+        var placeCard = placeCards[i];
+        var placeName = placeCard.getElementsByClassName("place_name")[0].innerText.toLowerCase();
+        var placeDescription = placeCard.getElementsByTagName("p")[0].innerText.toLowerCase();
+        var placeNotFound = placeName.indexOf(query) === -1 && placeDescription.indexOf(query) === -1;
+
+        // Hide or show place cards based on search query
+        if (placeNotFound) {
+            placeCard.style.display = "none";
+        } else {
+            placeCard.style.display = "flex";
+        }
+    }
+}
+
+const element = document.querySelector('.about_box');
+element.classList.add('show');
+
+
+
+    var info;
+
+    const placeCards = document.querySelectorAll('.place_card');
+
+
+    function info_click() {
+        document.querySelector('.info_box').style.display = 'flex';
+
+    }
+
+
+
+    placeCards.forEach((placeCard) => {
+        placeCard.addEventListener('click', () => {
+            var placeName = placeCard.querySelector('.place_name').textContent;
+            var placeDesc = placeCard.querySelector('#place_card_id').textContent;
+
+            document.querySelector('#info_box_h').textContent = placeName;
+            document.querySelector('#info_box_p').textContent = placeDesc;
+
+            info = placeName + "\n" + placeDesc;
+            console.log(info)
+        });
+    });
+    var intervalId = setInterval(function () {
+        // Find the button element
+        var button = document.querySelector('.dismissButton');
+
+        // Check if the button exists
+        if (button) {
+            // Stop the timer
+            clearInterval(intervalId);
+
+            // Simulate a click event on the button
+            button.click();
+            console.log("tick hey dude the map loads popup which is annoying as f so added a code that will close the pop up as soon it appears mind my english im gassed too late at night tired of this shit")
+        }
+    }, 100); // Check every 100 milliseconds
+
+
+    mapboxgl.accessToken = 'pk.eyJ1Ijoic29oYW1rNyIsImEiOiJjbGZ2YWVwZmEwNWQwM2VxdWVuYjJ2dTNnIn0.hIovNnWUO_jDabjpMcI6tQ';
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [73.8567, 18.5204],
+        zoom: 8
+    });
+
+    document.getElementById('map').style.display = 'none';
+
+    // Add click event listeners for the navigation cards
+    var navCards = document.getElementsByClassName('place_card');
+    for (var i = 0; i < navCards.length; i++) {
+        var navCard = navCards[i];
+        navCard.addEventListener('click', function () {
+            // Hide the navigation div
+            document.getElementById('nav').style.display = 'none';
+            var htmlElement = document.getElementsByTagName("html")[0];
+            htmlElement.style.filter = "invert(100%)";
+
+            // Show the map div
+            document.getElementById('map').style.display = 'block';
+
+            // Get the streetview location from the data attribute of the clicked card
+            var streetviewLocation = JSON.parse(this.getAttribute('data-streetview-location'));
+
+            // Load the street view of the location
+            var streetview = new google.maps.StreetViewService();
+            streetview.getPanorama({ location: streetviewLocation, radius: 50 }, function (data, status) {
+                if (status === google.maps.StreetViewStatus.OK) {
+                    var panorama = new google.maps.StreetViewPanorama(document.getElementById('map'), { position: streetviewLocation });
+                } else {
+                    alert('Street View data not found for this location.');
+                    console.log("Street View data not found for this location")
+                }
+            });
+        });
+    }
+
+
+
+
+
+
+
+panorama.addListener('pano_changed', function() {
+
+    // var streetViewEl = document.getElementById('streetview');
+    // streetViewEl.style.opacity = 1;
+
+    // var preloaderEl = document.querySelector('.preloader');
+    // preloaderEl.parentNode.removeChild(preloaderEl);
+  });
+
+</script>
+<script
+        src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBzYRJcyjmJ0l4Th1QVRDOh4ZhDO0RZxOE&callback=initMap'></script>
+
+<script
+        src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBzYRJcyjmJ0l4Th1QVRDOh4ZhDO0RZxOE&callback=initMap'></script>
+</script>
+
+</html>
