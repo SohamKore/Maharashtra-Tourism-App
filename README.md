@@ -2,6 +2,8 @@
  # Maharashtra-Tourism-App
 Maharashtra tourism app is a virtual tourism app that includes famous tourist places from every district of maharashtra With their description streetview, Panorama and 360. This app uses Google Street View api and Mapbox Api. Its easy to add places in this app using Lat and Long coordinate of streetview. you can customize it and add your own places.
 
+PREVIEW PROJECT: https://raw.githubusercontent.com/SohamKore/Maharashtra-Tourism-App/main/Maharstra%20Virtual%20Tourism%20App.html
+
  # MAIN NAVIGATION SCREEN INCLUDED MORE THAN 30+ PLACES
 ![Maharshtra Tourism Preview](https://user-images.githubusercontent.com/119067189/229337369-42da4fcb-1682-494a-92fe-dfda46a53590.png)
 
