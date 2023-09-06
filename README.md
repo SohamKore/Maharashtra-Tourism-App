@@ -1,4 +1,4 @@
- # Hi I'm Accepting Paid Project Requests if u got one mail me at:sxhamk@gmail.com 
+
  # Maharashtra-Tourism-App
 
 Preview/Render Project:
