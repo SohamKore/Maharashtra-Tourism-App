@@ -1013,11 +1013,13 @@ panorama.addListener('pano_changed', function() {
   });
 
 </script>
-<script
-        src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBzYRJcyjmJ0l4Th1QVRDOh4ZhDO0RZxOE&callback=initMap'></script>
+        <script>
+    const apiKey = "{{ secrets.GOOGLE_MAPS_API_KEY }}";
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`;
+    document.body.appendChild(script);
+</script>
 
-<script
-        src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBzYRJcyjmJ0l4Th1QVRDOh4ZhDO0RZxOE&callback=initMap'></script>
 </script>
 
 </html>
